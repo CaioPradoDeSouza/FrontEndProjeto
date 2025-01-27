@@ -5,20 +5,14 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { FileUpload } from 'primereact/fileupload';
-import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { RadioButton, RadioButtonChangeEvent } from 'primereact/radiobutton';
-import { Rating } from 'primereact/rating';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
-import React, { useEffect, useRef, useState } from 'react';
-import { ProductService } from '../../../../demo/service/ProductService';
-import { Demo } from '@/types';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { UsuarioService } from '@/service/UsuarioService';
+import { error } from 'console';
 
-/* @todo Used 'as any' for types here. Will fix in next version due to onSelectionChange event type issue. */
 const Usuario = () => {
     let usuarioVazio: Projeto.Usuario = {
         id: 0,
@@ -26,33 +20,34 @@ const Usuario = () => {
         login: '',
         email: '',
         senha: '',
-        
+
     };
 
-    const [usuarios, setUsuarios] = useState<Projeto.Usuario>([]);
+    const [usuarios, setUsuarios] = useState<Projeto.Usuario[]>([]);
     const [usuarioDialog, setUsuarioDialog] = useState(false);
     const [deleteUsuarioDialog, setDeleteUsuarioDialog] = useState(false);
     const [deleteUsuariosDialog, setDeleteUsuariosDialog] = useState(false);
     const [usuario, setUsuario] = useState<Projeto.Usuario>(usuarioVazio);
-    const [selectedUsuarios, setSelectedUsuarios] = useState(null);
+    const [selectedUsuarios, setSelectedUsuarios] = useState<Projeto.Usuario[]>([]);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
-    const usuarioService = new UsuarioService();
+    const usuarioService = useMemo(() => new UsuarioService(), []);
 
 
     useEffect(() => {
-        if(usuarios.length == 0) {
-        usuarioService.listarTodos().then((response) =>{
-            console.log(response.data);
-            setUsuarios(response.data);
-        }).catch((error) =>{
-            console.log(error);
-        })
+        if (usuarios.length == 0) {
+            usuarioService.listarTodos()
+            .then((response) => {
+                console.log(response.data);
+                setUsuarios(response.data);
+            }).catch((error) => {
+                console.log(error);
+            })
 
-    }
-    }, [usuarios]);
+        }
+    }, [usuarioService, usuarios]);
 
     const openNew = () => {
         setUsuario(usuarioVazio);
@@ -76,51 +71,51 @@ const Usuario = () => {
     const saveUsuario = () => {
         setSubmitted(true);
 
-        if(!usuario.id) {
+        if (!usuario.id) {
             usuarioService.inserir(usuario)
-                .then((response) => {  
+                .then((response) => {
                     setUsuarioDialog(false);
                     setUsuario(usuarioVazio);
                     setUsuarios([]);
                     toast.current?.show({
-                        severity:'success',
+                        severity: 'success',
                         summary: 'Successo',
                         detail: 'Usuario cadastrado com sucesso',
                         life: 3000
                     })
                 })
-                .catch((error)=>{
+                .catch((error) => {
                     console.log(error);
                     toast.current?.show({
-                        severity:'error',
+                        severity: 'error',
                         summary: 'Erro!',
                         detail: 'Erro ao salvar',
                         life: 3000
                     })
                 })
-        }else{
+        } else {
             usuarioService.alterar(usuario)
-                .then((response)=>{
+                .then((response) => {
                     setUsuarioDialog(false);
                     setUsuario(usuarioVazio);
                     setUsuarios([]);
                     toast.current?.show({
-                        severity:'success',
+                        severity: 'success',
                         summary: 'Sucesso',
                         detail: 'Usuario alterado com sucesso',
                         life: 3000
                     });
                 })
-                .catch((error)=>{
+                .catch((error) => {
                     console.log(error);
                     toast.current?.show({
-                        severity:'error',
+                        severity: 'error',
                         summary: 'Erro!',
                         detail: 'Erro ao alterar',
                         life: 3000
                     })
                 })
-        } 
+        }
     };
 
     const editUsuario = (usuario: Projeto.Usuario) => {
@@ -134,29 +129,29 @@ const Usuario = () => {
     };
 
     const deleteUsuario = () => {
-        // let _usuario = (usuarios as any)?.filter((val: any) => val.id !== usuario.id);
-        if(usuario.id){
+
+        if (usuario.id) {
             usuarioService.excluir(usuario.id)
-            .then((response)=>{
-                setUsuario(usuarioVazio),
-                setDeleteUsuarioDialog(false);
-                setUsuarios([]);
-                toast.current?.show({
-                    severity:'success',
-                    summary: 'Sucesso',
-                    detail: 'Usuario excluido',
-                    life: 3000
+                .then((response) => {
+                    setUsuario(usuarioVazio),
+                        setDeleteUsuarioDialog(false);
+                    setUsuarios([]);
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Sucesso',
+                        detail: 'Usuario excluido',
+                        life: 3000
+                    })
+                }).catch((error) => {
+                    console.log(error);
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Erro!',
+                        detail: 'Erro ao excluir',
+                        life: 3000
+                    })
                 })
-            }).catch((error)=>{
-                console.log(error);
-                toast.current?.show({
-                    severity:'error',
-                    summary: 'Erro!',
-                    detail: 'Erro ao excluir',
-                    life: 3000
-                })
-            })
-        }   
+        }
     };
 
     const exportCSV = () => {
@@ -168,23 +163,32 @@ const Usuario = () => {
     };
 
     const deleteSelectedUsuarios = () => {
-        let _usuarios = (usuarios as any)?.filter((val: any) => !(selectedUsuarios as any)?.includes(val));
-        setUsuarios(_usuarios);
-        setDeleteUsuariosDialog(false);
-        setSelectedUsuarios(null);
-        toast.current?.show({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Usuários deletados',
-            life: 3000
-        });
-    };
 
-    // const onCategoryChange = (e: RadioButtonChangeEvent) => {
-    //     let _product = { ...product };
-    //     _product['category'] = e.value;
-    //     setProduct(_product);
-    // };
+        Promise.all(
+            selectedUsuarios.map(async(_usuario) => {
+                if (_usuario.id) {
+                    await usuarioService.excluir(_usuario.id);
+                }
+            })
+        ).then((response)=>{
+            setUsuarios([]);
+            setSelectedUsuarios([]);
+            setDeleteUsuariosDialog(false);
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Sucesso',
+                detail: 'Usuarios excluidos',
+                life: 3000
+            })
+        }).catch((error)=>{
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Erro!',
+                detail: 'Erro ao excluir',
+                life: 3000
+            })
+        })
+    };
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: string) => {
         const val = (e.target && e.target.value) || '';
@@ -193,14 +197,6 @@ const Usuario = () => {
 
         setUsuario(_usuario);
     };
-
-    // const onInputNumberChange = (e: InputNumberValueChangeEvent, name: string) => {
-    //     const val = e.value || 0;
-    //     let _product = { ...product };
-    //     _product[`${name}`] = val;
-
-    //     setProduct(_product);
-    // };
 
     const leftToolbarTemplate = () => {
         return (
@@ -389,9 +385,9 @@ const Usuario = () => {
                             />
                             {submitted && !usuario.email && <small className="p-invalid">Email é obrigatório.</small>}
                         </div>
-                        
 
-                        
+
+
                     </Dialog>
 
                     <Dialog visible={deleteUsuarioDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteUsuarioDialogFooter} onHide={hideDeleteUsuarioDialog}>
