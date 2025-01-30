@@ -21,7 +21,7 @@ const Perfil = () => {
 
     };
 
-    const [perfis, setPerfis] = useState<Projeto.Perfil[]>([]);
+    const [perfis, setPerfis] = useState<Projeto.Perfil[] | null>(null);
     const [perfilDialog, setPerfilDialog] = useState(false);
     const [deletePerfilDialog, setDeletePerfilDialog] = useState(false);
     const [deletePerfisDialog, setDeletePerfisDialog] = useState(false);
@@ -35,7 +35,7 @@ const Perfil = () => {
 
 
     useEffect(() => {
-        if (perfis.length == 0) {
+        if (!perfis) {
             perfilService.listarTodos()
             .then((response) => {
                 console.log(response.data);
@@ -74,7 +74,7 @@ const Perfil = () => {
                 .then((response) => {
                     setPerfilDialog(false);
                     setPerfil(perfilVazio);
-                    setPerfis([]);
+                    setPerfis(null);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Successo',
@@ -96,7 +96,7 @@ const Perfil = () => {
                 .then((response) => {
                     setPerfilDialog(false);
                     setPerfil(perfilVazio);
-                    setPerfis([]);
+                    setPerfis(null);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Sucesso',
@@ -133,7 +133,7 @@ const Perfil = () => {
                 .then((response) => {
                     setPerfil(perfilVazio),
                     setDeletePerfilDialog(false);
-                    setPerfis([]);
+                    setPerfis(null);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Sucesso',
@@ -169,7 +169,7 @@ const Perfil = () => {
                 }
             })
         ).then((response)=>{
-            setPerfis([]);
+            setPerfis(null);
             setSelectedPerfis([]);
             setDeletePerfisDialog(false);
             toast.current?.show({

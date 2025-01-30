@@ -21,7 +21,7 @@ const Recurso = () => {
 
     };
 
-    const [recursos, setRecursos] = useState<Projeto.Recurso[]>([]);
+    const [recursos, setRecursos] = useState<Projeto.Recurso[]  | null>(null);
     const [recursoDialog, setRecursoDialog] = useState(false);
     const [deleteRecursoDialog, setDeleteRecursoDialog] = useState(false);
     const [deleteRecursosDialog, setDeleteRecursosDialog] = useState(false);
@@ -35,7 +35,7 @@ const Recurso = () => {
 
 
     useEffect(() => {
-        if (recursos.length == 0) {
+        if (!recursos) {
             recursoService.listarTodos()
             .then((response) => {
                 console.log(response.data);
@@ -74,7 +74,7 @@ const Recurso = () => {
                 .then((response) => {
                     setRecursoDialog(false);
                     setRecurso(recursoVazio);
-                    setRecursos([]);
+                    setRecursos(null);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Successo',
@@ -96,7 +96,7 @@ const Recurso = () => {
                 .then((response) => {
                     setRecursoDialog(false);
                     setRecurso(recursoVazio);
-                    setRecursos([]);
+                    setRecursos(null);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Sucesso',
@@ -133,7 +133,7 @@ const Recurso = () => {
                 .then((response) => {
                     setRecurso(recursoVazio),
                         setDeleteRecursoDialog(false);
-                    setRecursos([]);
+                    setRecursos(null);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Sucesso',
@@ -169,7 +169,7 @@ const Recurso = () => {
                 }
             })
         ).then((response)=>{
-            setRecursos([]);
+            setRecursos(null);
             setSelectedRecursos([]);
             setDeleteRecursosDialog(false);
             toast.current?.show({
