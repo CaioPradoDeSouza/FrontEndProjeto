@@ -301,26 +301,11 @@ const Perfil = () => {
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
                         <Column field="id" header="Código" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="descricao" header="Descrção" sortable body={descricaoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="descricao" header="Descrição" sortable body={descricaoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={perfilDialog} style={{ width: '450px' }} header="Detalhes de Perfil" modal className="p-fluid" footer={perfilDialogFooter} onHide={hideDialog}>  
-
-                        {/* <div className="field">
-                            <label htmlFor="id">Código</label>
-                            <InputText
-                                id="id"
-                                value={perfil.id}
-                                onChange={(e) => onInputChange(e, 'id')}
-                                required
-                                autoFocus
-                                className={classNames({
-                                    'p-invalid': submitted && !perfil.id
-                                })}
-                            />
-                            {submitted && !perfil.id && <small className="p-invalid">Código é obrigatório.</small>}
-                        </div> */}
 
                         <div className="field">
                             <label htmlFor="descricao">Descrição</label>
