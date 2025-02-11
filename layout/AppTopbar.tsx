@@ -18,7 +18,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
         topbarmenubutton: topbarmenubuttonRef.current
     }));
 
-    const logout =() =>{
+    const logout = () =>{
         localStorage.removeItem('TOKEN_APLICACAO_FRONTEND');
     }
 
